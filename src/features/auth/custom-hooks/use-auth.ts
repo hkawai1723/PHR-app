@@ -19,3 +19,8 @@ export const useAuth = () => {
     retry: 3,
   });
 };
+
+export const useGetUser = () => {
+  const { data: user } = useAuth();
+  return user;
+};
