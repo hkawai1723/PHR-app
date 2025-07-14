@@ -1,3 +1,4 @@
+//google OAuthでログインを行うmutationを提供。
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { loginWithGoogle, logout } from "@/lib/firebase/google-provider";
 import { auth } from "@firebase";

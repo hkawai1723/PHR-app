@@ -1,12 +1,13 @@
-import { createContext, useContext } from "react";
-import { User } from "firebase/auth";
+//not in use now
+// import { createContext, useContext } from "react";
+// import { User } from "firebase/auth";
 
-export interface AuthContextValue {
-  user: User | null;
-}
+// export interface AuthContextValue {
+//   user: User | null;
+// }
 
-export const AuthContext = createContext<AuthContextValue>({
-  user: null,
-});
+// export const AuthContext = createContext<AuthContextValue>({
+//   user: null,
+// });
 
-export const useAuthContext = () => useContext(AuthContext);
+// export const useAuthContext = () => useContext(AuthContext);

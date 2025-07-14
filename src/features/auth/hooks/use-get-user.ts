@@ -1,3 +1,4 @@
+//client componentでuserを取得する。tanstack queryを使用。
 import { useQuery } from "@tanstack/react-query";
 import { auth } from "@firebase";
 import type { User } from "firebase/auth";
