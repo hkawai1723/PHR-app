@@ -2,19 +2,20 @@
 import { adminAuth } from "@/lib/firebase/firebase-admin";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function Post(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
     const sessionCookie = await adminAuth.createSessionCookie(idToken, {
-      expiresIn: 60 * 60 * 24 * 30 * 1000,
-    }); // 30 days
+      expiresIn: 60 * 60 * 24 * 14 * 1000, // 14 days
+    });
     const response = NextResponse.json({ success: true });
     response.cookies.set("firebase-token", sessionCookie, {
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 14, // 14 days
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       sameSite: "lax",
     });
+    return response;
   } catch (error) {
     console.error("Error setting session cookie:", error);
     return NextResponse.json(

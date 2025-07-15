@@ -1,17 +1,16 @@
 "use client";
-import React from "react";
-import { Avatar, AvatarFallback } from "@ui/avatar";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
+import { Avatar, AvatarFallback } from "@ui/avatar";
+import { Button } from "@ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@ui/dropdown-menu";
-import { Button } from "@ui/button";
+import { LogOut } from "lucide-react";
 
 export const NavAvatar = () => {
   const user = useGetUser();
@@ -30,18 +29,25 @@ export const NavAvatar = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="bg-white p-4"
+        className="bg-white p-6"
         align="end"
         side="bottom"
         sideOffset={8}
       >
-        <DropdownMenuLabel>{user?.displayName || "Guest"}</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xl">
+          {user?.displayName || "Guest"}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator className="mx-1 bg-gray-400" />
-        <DropdownMenuItem>
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
-        </DropdownMenuItem>
+
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={handleLogout}
+          className="mt-4 text-xl"
+        >
+          <LogOut />
+          Logout
+        </Button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

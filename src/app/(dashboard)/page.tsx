@@ -10,8 +10,8 @@ const DashboardPage = () => {
         <h1 className="text-4xl text-center">Welcome!</h1>
         <div className="w-3xl mt-12 text-2xl space-y-8 max-w-screen px-10">
           <p>
-            With this PHR app, you can record your past medical history, family
-            history.
+            With this PHR app, you can record your past medical history and
+            family history.
           </p>
           <p>
             I made this app for my job hunting by the way. There was a PHR app

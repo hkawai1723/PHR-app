@@ -29,7 +29,7 @@ export const AuthSync = () => {
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   return null;
 };
