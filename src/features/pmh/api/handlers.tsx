@@ -95,7 +95,9 @@ async function deletePMH(
       );
     }
 
-    const docRef = adminDB.collection("pastMedicalHistory").doc(params.id);
+    const { id } = await params;
+
+    const docRef = adminDB.collection("pastMedicalHistory").doc(id);
     const doc = await docRef.get();
     if (!doc.exists) {
       return NextResponse.json(
