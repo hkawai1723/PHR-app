@@ -3,11 +3,14 @@
 import { useEffect } from "react";
 import { auth } from "@firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const AuthSync = () => {
+  const queryClient = useQueryClient();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        queryClient.setQueryData(["auth", "user"], user);
         //ログイン時：セッションクッキーを作成
         const idToken = await user.getIdToken();
         //cookieを作成するAPIを叩く
