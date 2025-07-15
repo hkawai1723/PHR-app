@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Home } from "lucide-react";
 export const Navbar = () => {
   return (
-    <div className="w-full border-b-1">
+    <div className="fixed top-0 left-0 w-full h-16 border-b-1 bg-white z-50">
       <NavigationMenu className="p-2 ">
         <NavigationMenuList>
           <NavigationMenuItem>
