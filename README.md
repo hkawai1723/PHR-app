@@ -11,7 +11,7 @@ Back end: Next.js 15, Tanstack Query, Firebase, Cloud Firestore
 
 ### Tanstack-query
 
-各 features 内の api folder に`useMutation`インスタンスを返却する関数を定義している。それらの関数の返り値のプロパティとしては以下のものがある。
+各 features 内の api folder に`useMutation`使用して mutation object を返却する関数を定義している。この関数の返り値 mutation object のプロパティとしては以下のものがある。
 
 ```
 {
@@ -35,28 +35,32 @@ Back end: Next.js 15, Tanstack Query, Firebase, Cloud Firestore
 }
 ```
 
-@/features/[feature]/apiにtanstack queryのuseMutationを使用してfirebaseに接続するcustom hooksを準備している。
-楽観的更新で実装。
+楽観的更新で実装している。
+
 #### mutation 使用例
+
 ```
 export const PMHForm = () => {
-  
+
   const createPMH = useCreatePMH();//useMutation関数の返り値であるmutationオブジェクトを返却します。
 
   const onSubmit = async (data) => {
-    //mutation objectのmutation method or mutateAsync methodを使用してfirestoreに接続します。
+    //mutation objectのmutation method or mutateAsync methodを使用してAPIを叩き、firestoreに接続しCURD操作を行います。
     createPMH.mutateAsync(data, {
       onSuccess: () => {
         //成功時の処理を記述
       }
     })
   };
+  return (
+    {/* JSXを記載 */}
+  )
 }
 ```
 
 ### 認証
 
-@/lib/firebase/google-provider に`loginWithGoogle`あり。@/features/auth/hooks/use-google-login.ts から、tanstack-query の mutation を使用してログインを行う。
+@/features/auth/hooks/use-google-login.ts から、tanstack-query の mutation object を使用してログインを行う。
 
 server component：@/utils/get-server-user.ts の`getUserOnServer`で user を取得可能。
 
@@ -94,7 +98,7 @@ notes: string;
 
 ```
 diseaseName: string pprequired;　//診断名
-relationship: string required;　//不明も許容
+relationship: string required;　//不明"unknown"も許容
 patientId: string; //家族ID(if exists)
 writtenBy: string required; //記載者のID
 notes: string;
@@ -104,5 +108,7 @@ updatedAt: timestamp required;
 
 ## TODO
 
-- Auth guard 実装
-- Family history 実装
+- [ ] Auth guard 実装
+- [ ] Past medical history 編集できる様にする
+- [ ] Past medical history 手術歴実装。
+- [ ] Family history 実装

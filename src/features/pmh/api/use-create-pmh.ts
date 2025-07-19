@@ -59,7 +59,7 @@ export const useCreatePMH = () => {
       //引数dataは、サーバーから返された新しいPMHのデータ。
       //楽観的更新で追加した一時的なIDを持つPMH、つまりidがtemp-idで始まるものは新しいdataで置き換える。そうでないものはそのまま。
       queryClient.setQueryData(
-        ["pmh", "list"],
+        ["pmh-list"],
         (old: PMHResponseType[] | undefined) => {
           if (!old) return [data];
 
