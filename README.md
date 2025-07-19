@@ -2,6 +2,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## 技術仕様
 
+Front end: React 19, React-hook-form, Zod
+Back end: Next.js 15, Tanstack Query, Firebase, Cloud Firestore
+
 ### firebase
 
 `{ app, auth, db }`(client)は/firebase.ts に格納されている。`@firebase`でアクセス可能
@@ -32,9 +35,28 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 }
 ```
 
+@/features/[feature]/apiにtanstack queryのuseMutationを使用してfirebaseに接続するcustom hooksを準備している。
+楽観的更新で実装。
+#### mutation 使用例
+```
+export const PMHForm = () => {
+  
+  const createPMH = useCreatePMH();//useMutation関数の返り値であるmutationオブジェクトを返却します。
+
+  const onSubmit = async (data) => {
+    //mutation objectのmutation method or mutateAsync methodを使用してfirestoreに接続します。
+    createPMH.mutateAsync(data, {
+      onSuccess: () => {
+        //成功時の処理を記述
+      }
+    })
+  };
+}
+```
+
 ### 認証
 
-@/lib/firebase/google-provider に`loginWithGoogle`あり。
+@/lib/firebase/google-provider に`loginWithGoogle`あり。@/features/auth/hooks/use-google-login.ts から、tanstack-query の mutation を使用してログインを行う。
 
 server component：@/utils/get-server-user.ts の`getUserOnServer`で user を取得可能。
 
@@ -67,3 +89,20 @@ operativeSite: string;
 medicalInstitution: string;
 notes: string;
 ```
+
+#### Family history
+
+```
+diseaseName: string pprequired;　//診断名
+relationship: string required;　//不明も許容
+patientId: string; //家族ID(if exists)
+writtenBy: string required; //記載者のID
+notes: string;
+createdAt : timestamp required;
+updatedAt: timestamp required;
+```
+
+## TODO
+
+- Auth guard 実装
+- Family history 実装

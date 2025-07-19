@@ -12,31 +12,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
-import { useCreatePMH } from "@/features/pmh/api/use-create-pmh";
-import { pmhSchema } from "@/features/pmh/pmh-schema";
+import { useCreateFamilyHistory } from "@/features/family-history/api/use-create-family-history";
+import { familyHistorySchema } from "@/features/family-history/family-history-schema";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-type PMHFormType = z.infer<typeof pmhSchema>;
-const DEFAULT_VALUES: PMHFormType = {
+type FamilyHistoryFormType = z.infer<typeof familyHistorySchema>;
+const DEFAULT_VALUES: FamilyHistoryFormType = {
   diseaseName: "",
-  diagnosisDate: "",
-  primaryCareProvider: "",
+  relationship: "",
   notes: "",
 };
 
-export const PMHForm = () => {
+export const FamilyHistoryForm = () => {
   const user = useGetUser();
-  const form = useForm<PMHFormType>({
-    resolver: zodResolver(pmhSchema),
+  const form = useForm<FamilyHistoryFormType>({
+    resolver: zodResolver(familyHistorySchema),
     defaultValues: DEFAULT_VALUES,
   });
-  const createPMH = useCreatePMH();
+  const createFamilyHistory = useCreateFamilyHistory();
 
-  const onSubmit = async (data: PMHFormType) => {
+  const onSubmit = async (data: FamilyHistoryFormType) => {
     if (!user) {
       console.error("User is not authenticated");
       return;
@@ -44,16 +43,16 @@ export const PMHForm = () => {
     try {
       const requestData = {
         ...data,
-        userId: user.uid, //TODO: 将来的に他人のPMHを登録できるようにする。
+        userId: user.uid, //TODO: 将来的に他人のFamilyHistoryを登録できるようにする。
       };
-      createPMH.mutateAsync(requestData, {
+      createFamilyHistory.mutateAsync(requestData, {
         onSuccess: () => {
           form.reset();
         },
       });
     } catch (error) {
-      //useCreatePMHのonErrorでtoast表示される。
-      console.error("Error submitting PMH form:", error);
+      //useCreateFamilyHistoryのonErrorでtoast表示される。
+      console.error("Error submitting FamilyHistory form:", error);
     }
   };
 
@@ -79,10 +78,10 @@ export const PMHForm = () => {
         />
         <FormField
           control={form.control}
-          name="diagnosisDate"
+          name="relationship"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xl">Diagnosis Date</FormLabel>
+              <FormLabel className="text-xl">Relationship</FormLabel>
               <FormControl>
                 <Input {...field} placeholder={`Example: "${formatDate()}"`} />
               </FormControl>
@@ -90,24 +89,7 @@ export const PMHForm = () => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="primaryCareProvider"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xl">
-                Primary Care Provider for the Disease
-              </FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="The place where you go for the disease."
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <FormField
           control={form.control}
           name="notes"
@@ -121,8 +103,12 @@ export const PMHForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="mt-4" disabled={createPMH.isPending}>
-          {createPMH.isPending ? (
+        <Button
+          type="submit"
+          className="mt-4"
+          disabled={createFamilyHistory.isPending}
+        >
+          {createFamilyHistory.isPending ? (
             <LoaderCircle className="animate-spin" />
           ) : (
             "Register"
