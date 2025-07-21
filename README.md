@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## 技術仕様
 
-Front end: React 19, React-hook-form, Zod
+Front end: React 19, Tailwind CSS, Shadcn/ui, Lucide react, React icons, React-hook-form, Zod
 Back end: Next.js 15, Tanstack Query, Firebase, Cloud Firestore
 
 ### firebase
@@ -97,7 +97,7 @@ notes: string;
 #### Family history
 
 ```
-diseaseName: string pprequired;　//診断名
+diseaseName: string required;　//診断名
 relationship: string required;　//不明"unknown"も許容
 patientId: string; //家族ID(if exists)
 writtenBy: string required; //記載者のID
