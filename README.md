@@ -109,6 +109,6 @@ updatedAt: timestamp required;
 ## TODO
 
 - [ ] Auth guard 実装
-- [ ] Past medical history 編集できる様にする
+- [x] Past medical history 編集できる様にする
 - [ ] Past medical history 手術歴実装。
 - [ ] Family history 実装
