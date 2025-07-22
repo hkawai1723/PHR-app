@@ -13,14 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useCreatePMH } from "@/features/pmh/api/use-create-pmh";
-import { pmhSchema } from "@/features/pmh/pmh-schema";
+import { pmhSchema, PMHSchemaType } from "@/features/pmh/pmh-types-and-schema";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-type PMHFormType = z.infer<typeof pmhSchema>;
+type PMHFormType = PMHSchemaType;
 const DEFAULT_VALUES: PMHFormType = {
   diseaseName: "",
   diagnosisDate: "",

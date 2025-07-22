@@ -1,5 +1,8 @@
+import {
+    PMHRequestType,
+    PMHResponseType,
+} from "@/features/pmh/pmh-types-and-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PMHResponseType, PMHRequestType } from "@/features/pmh/pmh-types";
 import { toast } from "sonner";
 
 const UpdatePMH = async (request: PMHRequestType, id: string) => {

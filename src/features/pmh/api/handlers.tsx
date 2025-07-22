@@ -2,11 +2,11 @@ import {
   PMHRequestType,
   PMHResponseType,
   PMHServerType,
-} from "@/features/pmh/pmh-types";
+} from "@/features/pmh/pmh-types-and-schema";
+import { adminDB } from "@/lib/firebase/firebase-admin";
+import { APIAuthError, checkUserOnAPI } from "@/lib/utils";
 import { Timestamp } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { adminDB } from "@/lib/firebase/firebase-admin";
-import { checkUserOnAPI, APIAuthError } from "@/lib/utils";
 
 export async function createPMH(request: Request) {
   try {
@@ -137,6 +137,7 @@ async function updatePMH(
       writtenBy: user.uid,
       updatedAt: Timestamp.now(),
     };
+
     await docRef.update(data);
 
     const updatedData = (await docRef.get()).data();
@@ -150,7 +151,7 @@ async function updatePMH(
       return error.response;
     }
 
-    console.log("Error on updating PMH:", error);
+    console.error("Error on updating PMH:", error);
     let errorMessage = "An unknown error occurred";
     if (error instanceof Error) {
       errorMessage = error.message;

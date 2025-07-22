@@ -1,15 +1,21 @@
 import { useDeletePMH } from "@/features/pmh/api/use-delete-pmh";
-import { pmhSchema } from "@/features/pmh/pmh-schema";
+import { DialogFormField } from "@/features/pmh/components/dialog-form-field";
+import {
+  PMHFieldNames,
+  PMHResponseType,
+  pmhSchema,
+  PMHSchemaType,
+} from "@/features/pmh/pmh-types-and-schema";
+import { initializeTextObject } from "@/features/pmh/utils/pmh-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@ui/button";
-import { DialogClose, DialogContent, DialogTitle } from "@ui/dialog";
-import { Input } from "@ui/input";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@ui/form";
+import { DialogContent, DialogTitle } from "@ui/dialog";
+import { Form } from "@ui/form";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { PMHResponseType } from "../pmh-types";
+import { useUpdatePMH } from "@/features/pmh/api/use-update-pmh";
+import { useGetUser } from "@/features/auth/hooks/use-get-user";
 
 interface PMHRecordDialogProps {
   record: PMHResponseType;
@@ -17,74 +23,77 @@ interface PMHRecordDialogProps {
 }
 
 type TextObjectType = {
-  [key: string]: {
+  [key in PMHFieldNames]: {
     value: string;
     isEditing: boolean;
   };
+} & {
+  hasEdited: boolean;
 };
 
 export const PMHRecordDialog = ({ record, onClose }: PMHRecordDialogProps) => {
-  const defaultValues: z.infer<typeof pmhSchema> = {
-    diseaseName: record.diseaseName,
-    diagnosisDate: record.diagnosisDate ?? "",
-    primaryCareProvider: record.primaryCareProvider ?? "",
-    notes: record.notes ?? "",
+  //defaultValueはuseFormに渡すための初期値。
+  //defaultTextStateはuseStateに渡すための初期値。textObjectにより、fieldが編集状態かどうかを管理する。
+  const user = useGetUser();
+  const createInitialState = (): PMHSchemaType => {
+    return {
+      diseaseName: record.diseaseName,
+      diagnosisDate: record.diagnosisDate ?? "",
+      primaryCareProvider: record.primaryCareProvider ?? "",
+      notes: record.notes ?? "",
+    };
   };
-  const mapped = Object.entries(defaultValues).map(([key, value]) => {
-    return [
-      key,
-      {
-        [key]: value,
-        isEditing: false,
-      },
-    ];
-  });
-  const defaultTextState: TextObjectType = Object.fromEntries(mapped);
+  const defaultTextState = initializeTextObject(createInitialState());
 
+  const [textObject, setTextObject] =
+    useState<TextObjectType>(defaultTextState);
   /* defaultTextStateの例
   {
-    diseaseName: {diseaseName: '統合失調症', isEditing: false},
-    diagnosisDate: {diagnosisDate: '2025-07-05', isEditing: false},
-    primaryCareProvider: {primaryCareProvider: '', isEditing: false},
-    notes: {notes: '', isEditing: false},
+    diseaseName: {value: '統合失調症', isEditing: false},
+    diagnosisDate: {value: '2025-07-05', isEditing: false},
+    primaryCareProvider: {value: '', isEditing: false},
+    notes: {value: '', isEditing: false},
+    hasEdited: false,
   }
   */
+  useEffect(() => {
+    //componentがrenderされたときにtextObjectを初期化する。
+    setTextObject(defaultTextState);
+  }, []);
 
-  const form = useForm<z.infer<typeof pmhSchema>>({
+  const form = useForm<PMHSchemaType>({
     resolver: zodResolver(pmhSchema),
-    defaultValues: defaultValues,
+    defaultValues: createInitialState(),
     mode: "onChange",
   });
 
-  const [textObject, setTextObject] = useState(defaultTextState);
-
-  const [isEditingAny, setIsEditingAny] = useState(false);
-
-  useEffect(() => {
-    //どれか一つでも編集したならsetIsEditingAnyをtrueに変更する。
-    const hasEditing = Object.values(textObject as TextObjectType).some(
-      (value) => value.isEditing
-    );
-    setIsEditingAny(hasEditing);
-  }, [textObject]);
-
-  const deletePMH = useDeletePMH();
-
-  const handleEditMode = (
-    formName: "diseaseName" | "diagnosisDate" | "primaryCareProvider" | "notes"
-  ) => {
-    const newTextObject = { ...textObject };
-    newTextObject[formName].isEditing = !newTextObject[formName].isEditing;
-    setTextObject(newTextObject);
+  const handleClose = () => {
+    if (textObject.hasEdited) {
+      const confirmed = window.confirm("Changes will not saved. Are you sure?");
+      if (!confirmed) return;
+    }
+    onClose();
   };
 
+  const updatePMH = useUpdatePMH();
+  const handleSave = async (formData: PMHSchemaType) => {
+    if (!user) {
+      throw new Error("Unauthorized user");
+    }
+    const data = {
+      ...formData,
+      userId: user.uid,
+    };
+    await updatePMH.mutateAsync({ data, id: record.id });
+    onClose();
+  };
+
+  const deletePMH = useDeletePMH();
   const handleDelete = async () => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${record.diseaseName}"?\nThis action cannot be undone.`
     );
-
     if (!confirmed) return;
-
     await deletePMH.mutateAsync(record.id);
     onClose();
   };
@@ -95,64 +104,61 @@ export const PMHRecordDialog = ({ record, onClose }: PMHRecordDialogProps) => {
         <DialogTitle>Past Medical History Record</DialogTitle>
       </VisuallyHidden>
       <Form {...form}>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={form.handleSubmit(handleSave)}>
           <div>
             <h3>Disease Name</h3>
-            <FormField
-              control={form.control}
-              name="diseaseName"
-              render={({ field }) => (
-                <FormItem>
-                  {textObject.diseaseName.isEditing ? (
-                    <FormControl>
-                      <Input
-                        {...field}
-                        onBlur={() => handleEditMode("diseaseName")}
-                        autoFocus
-                        onChange={(e) =>
-                          handleValueChange("diseaseName", e.target.value)
-                        }
-                      />
-                    </FormControl>
-                  ) : (
-                    <p onClick={() => handleEditMode("diseaseName")}>
-                      {textObject.diseaseName.value}
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
+            <DialogFormField
+              form={form}
+              formName="diseaseName"
+              textObject={textObject}
+              setTextObject={setTextObject}
             />
           </div>
 
           <div>
             <h3>Diagnosis Date</h3>
-            <p>{record.diagnosisDate || <br />}</p>
+            <DialogFormField
+              form={form}
+              formName="diagnosisDate"
+              textObject={textObject}
+              setTextObject={setTextObject}
+            />
           </div>
           <div>
             <h3>Primary Care Provider</h3>
-            <p>{record.primaryCareProvider || <br />}</p>
+            <DialogFormField
+              form={form}
+              formName="primaryCareProvider"
+              textObject={textObject}
+              setTextObject={setTextObject}
+            />
           </div>
           <div>
             <h3>Notes</h3>
-            <p>{record.notes || <br />}</p>
+            <DialogFormField
+              form={form}
+              formName="notes"
+              textObject={textObject}
+              setTextObject={setTextObject}
+              type="textarea"
+            />
           </div>
 
           <div className="flex items-center justify-between">
             <Button
               className="w-30 bg-blue-500 hover:bg-blue-400"
-              disabled={!isEditingAny}
+              disabled={!textObject.hasEdited}
             >
               Save
             </Button>
-            <DialogClose asChild>
-              <Button
-                className="w-30 bg-yellow-400 hover:bg-yellow-300 text-black"
-                type="button"
-              >
-                Cancel
-              </Button>
-            </DialogClose>
+
+            <Button
+              className="w-30 bg-yellow-400 hover:bg-yellow-300 text-black"
+              type="button"
+              onClick={handleClose}
+            >
+              Close
+            </Button>
           </div>
           <Button type="button" onClick={handleDelete} className="w-full">
             Delete

@@ -64,7 +64,7 @@ export const PMHForm = () => {
 
 server component：@/utils/get-server-user.ts の`getUserOnServer`で user を取得可能。
 
-client component：@/utils/features/auth/hooks/use-get-user.ts の`useGetUser`関数から user を取得可能。
+client component：@/features/auth/hooks/use-get-user.ts の`useGetUser`関数から user を取得可能。
 
 user 情報は tanstack-query で管理。サーバー側は cookie で認証を取得。
 

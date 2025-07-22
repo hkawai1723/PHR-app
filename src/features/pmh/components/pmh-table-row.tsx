@@ -1,10 +1,7 @@
-import {
-  Dialog,
-  DialogTrigger
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useState } from "react";
-import { PMHResponseType } from "../pmh-types";
+import { PMHResponseType } from "../pmh-types-and-schema";
 import { PMHRecordDialog } from "./pmh-record-dialog";
 
 export const PMHTableRow = ({ record }: { record: PMHResponseType }) => {
@@ -25,7 +22,9 @@ export const PMHTableRow = ({ record }: { record: PMHResponseType }) => {
           </TableCell>
         </TableRow>
       </DialogTrigger>
-      <PMHRecordDialog record={record} onClose={handleCloseDialog} />
+      {isDialogOpen && (
+        <PMHRecordDialog record={record} onClose={handleCloseDialog} />
+      )}
     </Dialog>
   );
 };

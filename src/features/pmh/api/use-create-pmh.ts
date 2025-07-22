@@ -1,8 +1,7 @@
-import { PMHRequestType, PMHResponseType } from "@/features/pmh/pmh-types";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { PMHRequestType, PMHResponseType } from "@/features/pmh/pmh-types-and-schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Timestamp } from "firebase/firestore";
+import { toast } from "sonner";
 
 export const CreatePMH = async (request: PMHRequestType) => {
   const response = await fetch("/api/past-medical-history", {
