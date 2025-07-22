@@ -1,7 +1,9 @@
-import { FamilyHistoryResponseType } from "@/features/family-history/family-history-types";
+import { FamilyHistoryResponseType } from "@/features/family-history/family-history-types-and-schema";
 import { useQuery } from "@tanstack/react-query";
 
-export const getFamilyHistoryList = async (): Promise<FamilyHistoryResponseType[]> => {
+export const getFamilyHistoryList = async (): Promise<
+  FamilyHistoryResponseType[]
+> => {
   const result = await fetch("/api/past-medical-history", {
     method: "GET",
     headers: {

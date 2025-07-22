@@ -1,4 +1,4 @@
-import { PMHResponseType } from "@/features/pmh/pmh-types";
+import { PMHResponseType } from "@/features/pmh/pmh-types-and-schema";
 import { useQuery } from "@tanstack/react-query";
 
 export const getPMHList = async (): Promise<PMHResponseType[]> => {

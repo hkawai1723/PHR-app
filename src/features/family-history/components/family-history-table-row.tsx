@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useState } from "react";
-import { FamilyHistoryResponseType } from "../family-history-types";
+import { FamilyHistoryResponseType } from "../family-history-types-and-schema";
 import { FamilyHistoryRecordDialog } from "./family-history-record-dialog";
 
 export const FamilyHistoryTableRow = ({ record }: { record: FamilyHistoryResponseType }) => {

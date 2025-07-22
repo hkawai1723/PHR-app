@@ -3,7 +3,7 @@ import { FamilyHistoryFormDialog } from './family-history-form-dialog';
 import { FamilyHistoryList } from './family-history-list';
 import { Plus } from 'lucide-react';
 
-export const PMHScreen = () => {
+export const FamilyHistoryScreen = () => {
   return (
     <div className="flex justify-center items-center h-scree">
       <div className="w-full m-8 p-8 md:w-[890px] bg-white">

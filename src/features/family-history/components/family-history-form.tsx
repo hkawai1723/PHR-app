@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useCreateFamilyHistory } from "@/features/family-history/api/use-create-family-history";
-import { familyHistorySchema } from "@/features/family-history/family-history-schema";
+import { familyHistorySchema } from "@/features/family-history/family-history-types-and-schema";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";

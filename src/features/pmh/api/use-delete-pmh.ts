@@ -1,4 +1,4 @@
-import { PMHResponseType } from "@/features/pmh/pmh-types";
+import { PMHResponseType } from "@/features/pmh/pmh-types-and-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

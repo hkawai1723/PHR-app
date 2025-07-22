@@ -1,7 +1,7 @@
 import React from "react";
 import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { FamilyHistoryResponseType } from "../family-history-types";
+import { FamilyHistoryResponseType } from "../family-history-types-and-schema";
 import { Button } from "@/components/ui/button";
 import { useDeleteFamilyHistory } from "@/features/family-history/api/use-delete-family-history";
 
