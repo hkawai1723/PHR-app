@@ -6,15 +6,16 @@ import { NextRequest } from "next/server";
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return deleteFamilyHistory(request, context);
+  const resolvedParams = await params;
+  return deleteFamilyHistory(request, { params: resolvedParams });
 }
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return updateFamilyHistory(request, context);
+  const resolvedParams = await params;
+  return updateFamilyHistory(request, { params: resolvedParams });
 }
-

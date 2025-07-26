@@ -3,14 +3,16 @@ import { NextRequest } from "next/server";
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return deletePMH(request, context);
+  const resolvedParams = await params;
+  return deletePMH(request, { params: resolvedParams });
 }
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return updatePMH(request, context);
+  const resolvedParams = await params;
+  return updatePMH(request, { params: resolvedParams });
 }

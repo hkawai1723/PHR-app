@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge";
 import { getUserOnServer } from "@/utils/get-server-user";
 import { NextResponse } from "next/server";
 import { UserRecord } from "firebase-admin/auth";
+import { FamilyHistorySchemaType } from "@/features/family-history/family-history-types-and-schema";
+import { PMHSchemaType } from "@/features/pmh/pmh-types-and-schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -51,12 +53,14 @@ export const checkUserOnAPI = async (): Promise<UserRecord> => {
   }
 };
 
-export const initializeTextObject = (defaultValue) => {
+export const initializeTextObject = (
+  defaultValue: FamilyHistorySchemaType | PMHSchemaType
+) => {
   const mapped = Object.entries(defaultValue).map(([key, value]) => {
     return [
       key,
       {
-        value: value,
+        value: value || "",
         isEditing: false,
       },
     ];
