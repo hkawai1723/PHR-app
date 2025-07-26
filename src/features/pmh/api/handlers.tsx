@@ -43,7 +43,7 @@ export async function createPMH(request: Request) {
   }
 }
 
-async function getPMHList() {
+export async function getPMHList() {
   /* "pastMedicalHistory"から、ログイン中のuser.uidと一致するデータを取得する。 */
   try {
     const user = await checkUserOnAPI();
@@ -76,7 +76,7 @@ async function getPMHList() {
   }
 }
 
-async function deletePMH(
+export async function deletePMH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -115,7 +115,7 @@ async function deletePMH(
   }
 }
 
-async function updatePMH(
+export async function updatePMH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -163,9 +163,4 @@ async function updatePMH(
   }
 }
 
-export const handlers = {
-  POST: createPMH,
-  GET: getPMHList,
-  DELETE: deletePMH,
-  PATCH: updatePMH,
-};
+

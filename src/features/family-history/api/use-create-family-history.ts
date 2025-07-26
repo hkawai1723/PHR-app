@@ -18,7 +18,7 @@ export const CreateFamilyHistory = async (
     body: JSON.stringify(request),
   });
   if (!response.ok) {
-    throw new Error("Failed to create Past Medical History");
+    throw new Error("Failed to create Family History"); // ✅ メッセージ修正
   }
   const data: FamilyHistoryResponseType = await response.json();
   return data;
@@ -30,69 +30,50 @@ export const useCreateFamilyHistory = () => {
     FamilyHistoryResponseType,
     Error,
     FamilyHistoryRequestType,
-    { previousFamilyHistoryList: FamilyHistoryResponseType[] | undefined }
+    {
+      previousFamilyHistoryList: FamilyHistoryResponseType[] | undefined;
+      tempId: string;
+    }
   >({
     mutationFn: async (data) => {
       const result = await CreateFamilyHistory(data);
       return result;
     },
     onMutate: async (newFamilyHistory) => {
-      //onMutateは、ミューテーションが開始される前に呼び出される関数。
-      //楽観的更新 Optimistic Updateの実装
-      //まず現在のクエリーをキャンセルすることでrefetchで古いデータで上書きされるのを防ぐ。
       await queryClient.cancelQueries({ queryKey: ["family-history-list"] });
       const previousFamilyHistoryList = queryClient.getQueryData<
         FamilyHistoryResponseType[]
       >(["family-history-list"]);
-      //楽観的更新：以前のFamilyHistoryListに新しいFamilyHistoryを一時的なIDを付与して追加。それを一時的にキャッシュに保存することで、ユーザーに即座に反映されるようにする。
-      //保存に成功すれば、キャッシュを正確なものに更新し、失敗した場合はrollbackする。
+
+      const tempId = `temp-id-${Date.now()}`;
+      const tempFamilyHistory: FamilyHistoryResponseType = {
+        ...newFamilyHistory,
+        id: tempId,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        writtenBy: newFamilyHistory.userId,
+      };
+
       queryClient.setQueryData<FamilyHistoryResponseType[]>(
         ["family-history-list"],
         (oldFamilyHistory) => {
-          const tempFamilyHistory: FamilyHistoryResponseType = {
-            ...newFamilyHistory,
-            id: `temp-id-${Date.now()}`, // 一時的なIDを生成
-            createdAt: Timestamp.now(),
-            updatedAt: Timestamp.now(),
-            writtenBy: newFamilyHistory.userId,
-          };
           return oldFamilyHistory
             ? [tempFamilyHistory, ...oldFamilyHistory]
             : [tempFamilyHistory];
         }
       );
 
-      return { previousFamilyHistoryList };
+      return { previousFamilyHistoryList, tempId };
     },
-    onSuccess: (data) => {
-      //成功時, サーバーから正確なデータを取得。
-      //引数dataは、サーバーから返された新しいFamilyHistoryのデータ。
-      //楽観的更新で追加した一時的なIDを持つFamilyHistory、つまりidがtemp-idで始まるものは新しいdataで置き換える。そうでないものはそのまま。
-      queryClient.setQueryData(
-        ["family-history-list"],
-        (old: FamilyHistoryResponseType[] | undefined) => {
-          if (!old) return [data];
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["family-history-list"] });
 
-          // 一時的なIDを持つアイテムを実際のデータに置き換え
-          return old.map((item) => {
-            if (
-              item.id.startsWith("temp-") &&
-              item.diseaseName === data.diseaseName
-            ) {
-              return data;
-            }
-            return item;
-          });
-        }
-      );
-
-      toast.success("FamilyHistory created successfully!");
+      toast.success("Family History created successfully!");
     },
     onError: (error, newFamilyHistory, context) => {
       console.error("Error creating FamilyHistory:", error);
-      toast.error("Failed to create Past Medical History");
+      toast.error("Failed to create Family History"); // ✅ メッセージ修正
 
-      // エラーが発生した場合、楽観的更新を元に戻す
       if (context?.previousFamilyHistoryList) {
         queryClient.setQueryData(
           ["family-history-list"],

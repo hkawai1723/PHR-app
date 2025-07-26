@@ -1,3 +1,20 @@
-import { handlers } from "@/features/family-history/api/handlers";
+import {
+  deleteFamilyHistory,
+  updateFamilyHistory,
+} from "@/features/family-history/api/handlers";
+import { NextRequest } from "next/server";
 
-export const { DELETE, PATCH } = handlers;
+export async function DELETE(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  return deleteFamilyHistory(request, context);
+}
+
+export async function PATCH(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  return updateFamilyHistory(request, context);
+}
+

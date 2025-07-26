@@ -118,3 +118,4 @@ updatedAt: timestamp required;
   - [x] useUpdateFamilyHistory 編集
   - [x] Record Dialog で family history を編集できる様にする
 - [ ] PMH, diagnosisDate のデータ型の検討。regex で check する？それとも date 型を使用する？
+- [ ] PMH, family history で全く同じデータが入力できてしまう。

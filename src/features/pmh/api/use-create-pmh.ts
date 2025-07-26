@@ -1,4 +1,7 @@
-import { PMHRequestType, PMHResponseType } from "@/features/pmh/pmh-types-and-schema";
+import {
+  PMHRequestType,
+  PMHResponseType,
+} from "@/features/pmh/pmh-types-and-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
@@ -24,7 +27,7 @@ export const useCreatePMH = () => {
     PMHResponseType,
     Error,
     PMHRequestType,
-    { previousPMHList: PMHResponseType[] | undefined }
+    { previousPMHList: PMHResponseType[] | undefined; tempId: string }
   >({
     mutationFn: async (data) => {
       const result = await CreatePMH(data);
@@ -40,10 +43,12 @@ export const useCreatePMH = () => {
       ]);
       //楽観的更新：以前のPMHListに新しいPMHを一時的なIDを付与して追加。それを一時的にキャッシュに保存することで、ユーザーに即座に反映されるようにする。
       //保存に成功すれば、キャッシュを正確なものに更新し、失敗した場合はrollbackする。
+      const tempId = `temp-id-${Date.now()}`;
+
       queryClient.setQueryData<PMHResponseType[]>(["pmh-list"], (oldPMH) => {
         const tempPMH: PMHResponseType = {
           ...newPMH,
-          id: `temp-id-${Date.now()}`, // 一時的なIDを生成
+          id: tempId, // 一時的なIDを生成
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
           writtenBy: newPMH.userId,
@@ -51,29 +56,13 @@ export const useCreatePMH = () => {
         return oldPMH ? [tempPMH, ...oldPMH] : [tempPMH];
       });
 
-      return { previousPMHList };
+      return { previousPMHList, tempId };
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       //成功時, サーバーから正確なデータを取得。
       //引数dataは、サーバーから返された新しいPMHのデータ。
       //楽観的更新で追加した一時的なIDを持つPMH、つまりidがtemp-idで始まるものは新しいdataで置き換える。そうでないものはそのまま。
-      queryClient.setQueryData(
-        ["pmh-list"],
-        (old: PMHResponseType[] | undefined) => {
-          if (!old) return [data];
-
-          // 一時的なIDを持つアイテムを実際のデータに置き換え
-          return old.map((item) => {
-            if (
-              item.id.startsWith("temp-") &&
-              item.diseaseName === data.diseaseName
-            ) {
-              return data;
-            }
-            return item;
-          });
-        }
-      );
+      queryClient.invalidateQueries({ queryKey: ["pmh-list"] });
 
       toast.success("PMH created successfully!");
     },

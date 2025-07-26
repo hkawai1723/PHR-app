@@ -6,9 +6,9 @@ import {
 import { adminDB } from "@/lib/firebase/firebase-admin";
 import { APIAuthError, checkUserOnAPI } from "@/lib/utils";
 import { Timestamp } from "firebase-admin/firestore";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function createFamilyHistory(request: Request) {
+export async function createFamilyHistory(request: NextRequest) {
   try {
     const user = await checkUserOnAPI();
     const body: FamilyHistoryRequestType = await request.json();
@@ -39,7 +39,7 @@ export async function createFamilyHistory(request: Request) {
   }
 }
 
-async function getFamilyHistoryList() {
+export async function getFamilyHistoryList() {
   /* "familyHistory"から、ログイン中のuser.uidと一致するデータを取得する。 */
   try {
     const user = await checkUserOnAPI();
@@ -72,8 +72,8 @@ async function getFamilyHistoryList() {
   }
 }
 
-async function deleteFamilyHistory(
-  request: Request,
+export async function deleteFamilyHistory(
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -107,8 +107,8 @@ async function deleteFamilyHistory(
   }
 }
 
-async function updateFamilyHistory(
-  request: Request,
+export async function updateFamilyHistory(
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -155,9 +155,3 @@ async function updateFamilyHistory(
   }
 }
 
-export const handlers = {
-  POST: createFamilyHistory,
-  GET: getFamilyHistoryList,
-  DELETE: deleteFamilyHistory,
-  PATCH: updateFamilyHistory,
-};
