@@ -1,4 +1,4 @@
-import { PMHSchemaType } from "@/features/pmh/pmh-types-and-schema";
+import { FamilyHistorySchemaType } from "@/features/family-history/family-history-types-and-schema";
 import { FormControl, FormField, FormItem, FormMessage } from "@ui/form";
 import { Input } from "@ui/input";
 import { Textarea } from "@ui/textarea";
@@ -9,21 +9,19 @@ type FieldState = {
   value: string;
   isEditing: boolean;
 };
-
 type TextObjectType = {
   diseaseName: FieldState;
-  diagnosisDate: FieldState;
-  primaryCareProvider: FieldState;
+  relationship: FieldState;
   notes: FieldState;
-  hasEdited: boolean; 
+  hasEdited: boolean;
 };
 
 interface Props {
-  form: UseFormReturn<PMHSchemaType>;
-  formName: keyof PMHSchemaType;
+  form: UseFormReturn<FamilyHistorySchemaType>;
+  formName: keyof FamilyHistorySchemaType;
   textObject: TextObjectType;
   setTextObject: React.Dispatch<React.SetStateAction<TextObjectType>>;
-  type?: "text" | "date" | "textarea";
+  type?: "text" | "textarea";
 }
 
 export const DialogFormField = ({
@@ -42,6 +40,7 @@ export const DialogFormField = ({
       },
     }));
   };
+
   const handleValueChange = (formValue: string) => {
     setTextObject((prev: TextObjectType) => ({
       ...prev,
@@ -49,7 +48,7 @@ export const DialogFormField = ({
         ...prev[formName],
         value: formValue,
       },
-      hasEdited: true,
+      hasEdited: true, // #TODO: 冗長。何回か編集しても毎度hasEditedがtrueに変更される。一度変更したらあとは変更不要ではある。
     }));
     form.setValue(formName, formValue);
   };

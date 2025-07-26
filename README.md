@@ -45,7 +45,7 @@ export const PMHForm = () => {
   const createPMH = useCreatePMH();//useMutation関数の返り値であるmutationオブジェクトを返却します。
 
   const onSubmit = async (data) => {
-    //mutation objectのmutation method or mutateAsync methodを使用してAPIを叩き、firestoreに接続しCURD操作を行います。
+    //mutation objectのmutate method or mutateAsync methodを使用してAPIを叩き、firestoreに接続しCURD操作を行います。
     createPMH.mutateAsync(data, {
       onSuccess: () => {
         //成功時の処理を記述
@@ -72,6 +72,8 @@ user 情報は tanstack-query で管理。サーバー側は cookie で認証を
 
 ### Database
 
+database は firestore(document oriented NoSQL)を使用しています。SQL でも実装できそうでしたが NoSQL を利用している理由は分かりません。プロジェクト的に firestore を使用する方針となっていたので、今回のポートフォリオでも firestore を使用しています。
+
 #### Past medical history
 
 ```
@@ -97,9 +99,10 @@ notes: string;
 #### Family history
 
 ```
+Collection ID: familyHistory
 diseaseName: string required;　//診断名
 relationship: string required;　//不明"unknown"も許容
-patientId: string; //家族ID(if exists)
+userId: string required:
 writtenBy: string required; //記載者のID
 notes: string;
 createdAt : timestamp required;
@@ -111,4 +114,7 @@ updatedAt: timestamp required;
 - [ ] Auth guard 実装
 - [x] Past medical history 編集できる様にする
 - [ ] Past medical history 手術歴実装。
-- [ ] Family history 実装
+- [x] Family history 実装
+  - [x] useUpdateFamilyHistory 編集
+  - [x] Record Dialog で family history を編集できる様にする
+- [ ] PMH, diagnosisDate のデータ型の検討。regex で check する？それとも date 型を使用する？

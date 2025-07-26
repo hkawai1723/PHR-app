@@ -1,6 +1,6 @@
 import {
-    PMHRequestType,
-    PMHResponseType,
+  PMHRequestType,
+  PMHResponseType,
 } from "@/features/pmh/pmh-types-and-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ export const useUpdatePMH = () => {
         ["pmh-list"],
         (oldPMHList) => {
           if (!oldPMHList) return [];
-          oldPMHList?.map((oldPMH) => {
+          oldPMHList.map((oldPMH) => {
             if (oldPMH.id === newPMH.id) {
               return {
                 ...oldPMH,

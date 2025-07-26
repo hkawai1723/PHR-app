@@ -1,14 +1,14 @@
 "use client";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { Avatar, AvatarFallback } from "@ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { Button } from "@ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 
@@ -23,6 +23,7 @@ export const NavAvatar = () => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="me-4">
         <Avatar className="size-10">
+          <AvatarImage src={user?.photoURL ? user.photoURL : undefined} />
           <AvatarFallback className="bg-blue-500 text-white">
             {user?.displayName ? user?.displayName[0] : "U"}
           </AvatarFallback>

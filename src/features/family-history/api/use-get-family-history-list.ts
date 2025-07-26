@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 export const getFamilyHistoryList = async (): Promise<
   FamilyHistoryResponseType[]
 > => {
-  const result = await fetch("/api/past-medical-history", {
+  const result = await fetch("/api/family-history", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +16,7 @@ export const getFamilyHistoryList = async (): Promise<
   if (!result.ok) {
     const errorText = await result.text();
     console.error(errorText);
-    throw new Error("Failed to fetch Past Medical History list");
+    throw new Error("Failed to fetch family history list");
   }
   const response = await result.json();
 

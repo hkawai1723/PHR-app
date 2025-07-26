@@ -1,4 +1,6 @@
+import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useDeletePMH } from "@/features/pmh/api/use-delete-pmh";
+import { useUpdatePMH } from "@/features/pmh/api/use-update-pmh";
 import { DialogFormField } from "@/features/pmh/components/dialog-form-field";
 import {
   PMHFieldNames,
@@ -6,7 +8,7 @@ import {
   pmhSchema,
   PMHSchemaType,
 } from "@/features/pmh/pmh-types-and-schema";
-import { initializeTextObject } from "@/features/pmh/utils/pmh-utils";
+import { initializeTextObject } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@ui/button";
@@ -14,14 +16,13 @@ import { DialogContent, DialogTitle } from "@ui/dialog";
 import { Form } from "@ui/form";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useUpdatePMH } from "@/features/pmh/api/use-update-pmh";
-import { useGetUser } from "@/features/auth/hooks/use-get-user";
 
 interface PMHRecordDialogProps {
   record: PMHResponseType;
   onClose: () => void; // ダイアログを閉じる関数を追加
 }
 
+//useStateで管理するobjectです。それぞれのfield(diseaseName, diagnosisDate, primaryCareProvider, notes)の値と編集状態を管理し、一度でも編集が行われたかどうかをcheckします。
 type TextObjectType = {
   [key in PMHFieldNames]: {
     value: string;
@@ -44,20 +45,21 @@ export const PMHRecordDialog = ({ record, onClose }: PMHRecordDialogProps) => {
     };
   };
   const defaultTextState = initializeTextObject(createInitialState());
-
-  const [textObject, setTextObject] =
-    useState<TextObjectType>(defaultTextState);
   /* defaultTextStateの例
   {
     diseaseName: {value: '統合失調症', isEditing: false},
     diagnosisDate: {value: '2025-07-05', isEditing: false},
-    primaryCareProvider: {value: '', isEditing: false},
-    notes: {value: '', isEditing: false},
+    primaryCareProvider: {value: '広島大学病院', isEditing: false},
+    notes: {value: 'オランザピンで使用中', isEditing: false},
     hasEdited: false,
   }
   */
+  const [textObject, setTextObject] =
+    useState<TextObjectType>(defaultTextState);
+
   useEffect(() => {
     //componentがrenderされたときにtextObjectを初期化する。
+    //これがないと、dialogを閉じた後、再度開いた際に前回のtextObjectが保持されている。
     setTextObject(defaultTextState);
   }, []);
 
@@ -72,10 +74,11 @@ export const PMHRecordDialog = ({ record, onClose }: PMHRecordDialogProps) => {
       const confirmed = window.confirm("Changes will not saved. Are you sure?");
       if (!confirmed) return;
     }
+    setTextObject(defaultTextState);
     onClose();
   };
 
-  const updatePMH = useUpdatePMH();
+  const updatePMH = useUpdatePMH(); //tanstack-query useMutation参照
   const handleSave = async (formData: PMHSchemaType) => {
     if (!user) {
       throw new Error("Unauthorized user");
@@ -160,11 +163,11 @@ export const PMHRecordDialog = ({ record, onClose }: PMHRecordDialogProps) => {
               Close
             </Button>
           </div>
-          <Button type="button" onClick={handleDelete} className="w-full">
-            Delete
-          </Button>
         </form>
       </Form>
+      <Button type="button" onClick={handleDelete} className="w-full">
+        Delete
+      </Button>
     </DialogContent>
   );
 };

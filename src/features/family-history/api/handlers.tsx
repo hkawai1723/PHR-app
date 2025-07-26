@@ -3,20 +3,21 @@ import {
   FamilyHistoryResponseType,
   FamilyHistoryServerType,
 } from "@/features/family-history/family-history-types-and-schema";
-import { getUserOnServer } from "@/utils/get-server-user";
+import { adminDB } from "@/lib/firebase/firebase-admin";
+import { APIAuthError, checkUserOnAPI } from "@/lib/utils";
 import { Timestamp } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { adminDB } from "@/lib/firebase/firebase-admin";
 
 export async function createFamilyHistory(request: Request) {
   try {
+    const user = await checkUserOnAPI();
     const body: FamilyHistoryRequestType = await request.json();
     const { userId, ...formData } = body;
-    const docRef = adminDB.collection("pastMedicalHistory").doc();
+    const docRef = adminDB.collection("familyHistory").doc();
     const FamilyHistoryData = {
       ...formData,
       userId,
-      writtenBy: userId,
+      writtenBy: user.uid,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     };
@@ -39,23 +40,13 @@ export async function createFamilyHistory(request: Request) {
 }
 
 async function getFamilyHistoryList() {
-  /* "pastMedicalHistory"から、ログイン中のuser.uidと一致するデータを取得する。 */
+  /* "familyHistory"から、ログイン中のuser.uidと一致するデータを取得する。 */
   try {
-    const user = await getUserOnServer();
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Unauthorized: User not authenticated",
-        },
-        { status: 401 }
-      );
-    }
+    const user = await checkUserOnAPI();
     const snapshot = await adminDB
-      .collection("pastMedicalHistory")
+      .collection("familyHistory")
       .where("userId", "==", user.uid)
-      .orderBy("diagnosisDate", "desc")
+      .orderBy("relationship", "desc")
       .get();
 
     // if (snapshot.empty) {
@@ -86,20 +77,11 @@ async function deleteFamilyHistory(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getUserOnServer();
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Unauthorized: User not authenticated",
-        },
-        { status: 401 }
-      );
-    }
+    await checkUserOnAPI();
 
-    const { id } = await params;
+    const { id } = params;
 
-    const docRef = adminDB.collection("pastMedicalHistory").doc(id);
+    const docRef = adminDB.collection("familyHistory").doc(id);
     const doc = await docRef.get();
     if (!doc.exists) {
       return NextResponse.json(
@@ -125,46 +107,57 @@ async function deleteFamilyHistory(
   }
 }
 
-// const async function updateHistory(request: Request, {params}: {params: {id: string}}) {
-//   try {
-//     const body: FamilyHistoryRequestType = await request.json();
-//     const { userId, ...formData } = body;
+async function updateFamilyHistory(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const user = await checkUserOnAPI();
+    const { id } = params;
+    const body = await request.json();
 
-//     const docRef = adminDB.collection("pastMedicalHistory").doc(params.id);
-//     const doc = await docRef.get();
-//     if (!doc.exists) {
-//       return NextResponse.json(
-//         { success: false, error: "FamilyHistory not found" },
-//         { status: 404 }
-//       );
-//     }
-//     const FamilyHistoryData: FamilyHistoryServerType = {
-//       ...formData,
-//       userId,
-//       writtenBy: userId,
-//       updatedAt: Timestamp.now(),
-//     };
-//     await docRef.update(FamilyHistoryData);
-//     return NextResponse.json({
-//       success: true,
-//       data: { id: docRef.id, ...FamilyHistoryData },
-//     });
-//   } catch (error) {
-//     console.error("Error updating FamilyHistory:", error);
-//     let errorMessage = "An unknown error occurred.";
-//     if (error instanceof Error) {
-//       errorMessage = error.message;
-//     }
-//     return NextResponse.json(
-//       { success: false, error: errorMessage },
-//       { status: 500 }
-//     );
-//   }
-// }
+    const docRef = adminDB.collection("familyHistory").doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      return NextResponse.json(
+        { success: false, error: "Family history not found" },
+        { status: 404 }
+      );
+    }
+
+    const data = {
+      ...body,
+      writtenBy: user.uid,
+      updatedAt: Timestamp.now(),
+    };
+
+    await docRef.update(data);
+
+    const updatedData = (await docRef.get()).data();
+    return NextResponse.json({
+      success: true,
+      data: { id: docRef.id, ...updatedData },
+    });
+  } catch (error) {
+    if (error instanceof APIAuthError) {
+      return error.response;
+    }
+
+    console.error("Error on updating PMH:", error);
+    let errorMessage = "An unknown error occurred";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json(
+      { success: false, error: errorMessage },
+      { status: 500 }
+    );
+  }
+}
 
 export const handlers = {
   POST: createFamilyHistory,
   GET: getFamilyHistoryList,
   DELETE: deleteFamilyHistory,
-  // PATCH: updateHistory,
+  PATCH: updateFamilyHistory,
 };

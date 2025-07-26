@@ -32,11 +32,8 @@ export const FamilyHistoryList = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="text-center">Disease</TableHead>
-            <TableHead className="text-center hidden lg:table-cell">
-              Diagnosis Date
-            </TableHead>
-            <TableHead className="text-center hidden lg:table-cell">
-              Primary Care Provider
+            <TableHead className="text-center">
+              Relationship
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -54,12 +51,12 @@ export const FamilyHistoryList = () => {
             })
           ) : (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={3}>
+              <TableCell colSpan={2}>
                 <FamilyHistoryFormDialog
                   variant="outline"
                   className="w-full h-12 border-none shadow-none"
                 >
-                  Record medical history
+                  Record family history
                 </FamilyHistoryFormDialog>
               </TableCell>
             </TableRow>

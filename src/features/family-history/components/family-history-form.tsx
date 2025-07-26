@@ -14,7 +14,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useGetUser } from "@/features/auth/hooks/use-get-user";
 import { useCreateFamilyHistory } from "@/features/family-history/api/use-create-family-history";
 import { familyHistorySchema } from "@/features/family-history/family-history-types-and-schema";
-import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -43,7 +42,7 @@ export const FamilyHistoryForm = () => {
     try {
       const requestData = {
         ...data,
-        userId: user.uid, //TODO: 将来的に他人のFamilyHistoryを登録できるようにする。
+        userId: user.uid, //TODO: 将来的に他人のfamily historyを登録できるようにする。
       };
       createFamilyHistory.mutateAsync(requestData, {
         onSuccess: () => {
@@ -83,7 +82,7 @@ export const FamilyHistoryForm = () => {
             <FormItem>
               <FormLabel className="text-xl">Relationship</FormLabel>
               <FormControl>
-                <Input {...field} placeholder={`Example: "${formatDate()}"`} />
+                <Input {...field} placeholder={"Example: 'Mother'"} />
               </FormControl>
               <FormMessage />
             </FormItem>

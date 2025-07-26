@@ -9,9 +9,13 @@ export const familyHistorySchema = z.object({
   notes: z.string().max(1024, "Notes must be less than 1024 characters"),
 });
 
+export type FamilyHistorySchemaType = z.infer<typeof familyHistorySchema>;
+
+export type FamilyHistoryFieldNames = "diseaseName" | "relationship" | "notes";
+
 export interface FamilyHistoryType {
   diseaseName: string;
-  relationship: string | null;
+  relationship: string;
   notes: string | null;
 }
 export interface FamilyHistoryRequestType extends FamilyHistoryType {

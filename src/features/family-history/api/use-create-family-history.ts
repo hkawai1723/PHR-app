@@ -10,7 +10,7 @@ import { Timestamp } from "firebase/firestore";
 export const CreateFamilyHistory = async (
   request: FamilyHistoryRequestType
 ) => {
-  const response = await fetch("/api/past-medical-history", {
+  const response = await fetch("/api/family-history", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export const useCreateFamilyHistory = () => {
       //引数dataは、サーバーから返された新しいFamilyHistoryのデータ。
       //楽観的更新で追加した一時的なIDを持つFamilyHistory、つまりidがtemp-idで始まるものは新しいdataで置き換える。そうでないものはそのまま。
       queryClient.setQueryData(
-        ["family-history", "list"],
+        ["family-history-list"],
         (old: FamilyHistoryResponseType[] | undefined) => {
           if (!old) return [data];
 

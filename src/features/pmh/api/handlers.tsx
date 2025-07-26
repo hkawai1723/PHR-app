@@ -83,7 +83,7 @@ async function deletePMH(
   try {
     await checkUserOnAPI();
 
-    const { id } = await params;
+    const { id } = params;
 
     const docRef = adminDB.collection("pastMedicalHistory").doc(id);
     const doc = await docRef.get();
@@ -121,7 +121,7 @@ async function updatePMH(
 ) {
   try {
     const user = await checkUserOnAPI();
-    const { id } = await params;
+    const { id } = params;
     const body = await request.json();
 
     const docRef = adminDB.collection("pastMedicalHistory").doc(id);
